@@ -42,8 +42,8 @@
 #################################
 #CHANGE BELOW VARIABLES
 
-$vmName = "AzureProcSrv"     ## Name of the VM to be moved
-$rgName = "resize"    ## Name of Resource Group that the VM is in
+$vmName = "<Insert VM Name>"     ## Name of the VM to be moved
+$rgName = "<Insert VM Resource Group>"    ## Name of Resource Group that the VM is in
 $asName = ""       ## Name of Availability Set. (See Availability Set note above)
 $asForce = $true         ## Force the Availability Set to be set. (See Availability Set note above)
 $newVMName = $vmname  ## This script can also rename the computer name. Put new VMName here or replace it with the $vmname variable if you are keeping the name the same.
@@ -57,9 +57,9 @@ $vmNewSize = "Standard_F64s_v2"       ## The new size of the VM. Leave blank to 
     ### If you do not plan to change the VNet of the VM:
     ###     - Set $changeVNet to $false and the rest of the variables will not be used.
 $changeVNet = $false
-$newVnet = "Deleteme-vnet" ## Existing VNet Name to put the VM in
-$newSubnet = "default" ## Existing Subnet name to put the VM in
-$newVNetRGName = "Deleteme" ## Resource Group to put new NIC in
+$newVnet = "<Insert VNet Name>" ## Existing VNet Name to put the VM in
+$newSubnet = "<Insert Subnet Name>" ## Existing Subnet name to put the VM in
+$newVNetRGName = "<Insert Resource Group of NIC>" ## Resource Group to put new NIC in
 $newNICName = "$newVMName-new2" ## Name of new NIC
 
 #################################
