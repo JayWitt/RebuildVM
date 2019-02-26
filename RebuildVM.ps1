@@ -1,4 +1,4 @@
-﻿#
+#
 #Sample scripts are not supported under any Microsoft standard support program or service. 
 #The sample scripts are provided AS IS without warranty of any kind. Microsoft disclaims all 
 #implied warranties including, without limitation, any implied warranties of merchantability
@@ -35,18 +35,19 @@
 
 
 # Created By: Jay Witt
-# Updated on 1/2/2019
+# Updated on 2/17/2019
 
 
 #################################
 #################################
 #CHANGE BELOW VARIABLES
 
-$vmName = "Name3"     ## Name of the VM to be moved
-$rgName = "deleteme"    ## Name of Resource Group that the VM is in
+$vmName = "AzureProcSrv"     ## Name of the VM to be moved
+$rgName = "resize"    ## Name of Resource Group that the VM is in
 $asName = ""       ## Name of Availability Set. (See Availability Set note above)
 $asForce = $true         ## Force the Availability Set to be set. (See Availability Set note above)
 $newVMName = $vmname  ## This script can also rename the computer name. Put new VMName here or replace it with the $vmname variable if you are keeping the name the same.
+$vmNewSize = "Standard_F64s_v2"       ## The new size of the VM. Leave blank to leave it the same.
 
     ### If you plan to change the VNet:
     ###     - Set $changeVNet to $true
@@ -86,7 +87,11 @@ $oldVM.Extensions | ConvertTo-Json | out-file .\Before-$vmName-$Random-Extension
 ## Store the original Vm options
 
 $location = $oldVM.Location
-$vmSize = $oldVM.HardwareProfile.VmSize
+if ($vmNewSize -ne "") {
+        $vmsize = $vmNewSize
+    } else {
+        $vmSize = $oldVM.HardwareProfile.VmSize
+    }
 $nicName = $oldvm.NetworkProfile.NetworkInterfaces.id.split("/")[$oldvm.NetworkProfile.NetworkInterfaces.id.split("/").count-1]
 $nic = Get-AzureRmNetworkInterface -name $nicName -ResourceGroupName $rgname
 $subnetID = $nic.IpConfigurations.subnet.id
@@ -101,6 +106,21 @@ $DataDiskLayout = $oldvm.StorageProfile.DataDisks
 $LicenseType = $oldvm.LicenseType
 $tags = $oldvm.Tags
 $oldAS = $oldvm.AvailabilitySetReference
+
+$oldVMName = $oldVM.Name
+if ($oldvm.Name -ne $vmName) {
+    write-host "    VMName: $oldVMName [New Name = $vmName]" -ForegroundColor Magenta
+} else {
+    write-host "    VMName: $oldVMName" -ForegroundColor Magenta
+}
+$oldNICcount = ($oldVM.NetworkProfile.NetworkInterfaces).count
+write-host "    Nics: $oldNICCount" -ForegroundColor Magenta
+write-host "    Current Availability Set: $oldAS" -ForegroundColor Magenta
+write-host "    Tags: "$tags -ForegroundColor Magenta
+write-host "    Primary NIC VNet: $VNetName" -ForegroundColor Magenta
+$subnetname = $subnetID.split("/")[$subnetID.split("/").count-1]
+write-host "    Primary NIC Subnet: $subnetName" -ForegroundColor Magenta
+write-host " "
 
 ## Delete the Compute side of the VM
 write-host "About to delete the compute of old VM" -ForegroundColor Yellow
